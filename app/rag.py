@@ -39,8 +39,20 @@ class MumsRAG:
         self.documents.append(file_path)
 
     def query(self, question: str) -> list[str]:
-        # TODO: Implement in next step
-        pass
+        if not question.strip():
+            raise ValueError("Query cannot be empty")
+
+        if self.vectorstore is None:
+            return []
+
+        # Lower score = more similar in FAISS
+        results = self.vectorstore.similarity_search_with_score(question, k=4)
+
+        # Filter out irrelevant results
+        threshold = 0.5
+        relevant = [doc for doc, score in results if score < threshold]
+
+        return [doc.page_content for doc in relevant]
 
 
 if __name__ == "__main__":
