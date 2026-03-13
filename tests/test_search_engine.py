@@ -39,3 +39,30 @@ class TestSearchEngine(unittest.TestCase):
     results = self.search_engine.search("Who is the CEO of Mums AB?")
     self.assertIsInstance(results, list)
     self.assertGreater(len(results), 0, "Search should return at least one result")
+
+  def test_semantic_search(self):
+    # Embeddings should find related concepts, not just exact keyword matches
+    self.search_engine.add_document("mums_ab_product_descriptions.pdf")
+    results = self.search_engine.search("healthy snacks")
+    self.assertGreater(len(results), 0, "Semantic search should find related products")
+
+  def test_multi_document_search(self):
+    # Search should work across multiple documents
+    self.search_engine.add_document("mums_ab_organizational_structure.pdf")
+    self.search_engine.add_document("mums_ab_product_descriptions.pdf")
+    self.search_engine.add_document("mums_ab_annual_sales_report.pdf")
+
+    org_results = self.search_engine.search("Who leads the company?")
+    product_results = self.search_engine.search("What ingredients are used?")
+
+    self.assertGreater(len(org_results), 0, "Should find org structure info")
+    self.assertGreater(len(product_results), 0, "Should find product info")
+
+  def test_result_contains_relevant_content(self):
+    # Verify results actually contain relevant information
+    self.search_engine.add_document("mums_ab_organizational_structure.pdf")
+    results = self.search_engine.search("CEO")
+
+    self.assertGreater(len(results), 0)
+    combined_results = " ".join(results).lower()
+    self.assertIn("ceo", combined_results, "Results should contain the queried term")
