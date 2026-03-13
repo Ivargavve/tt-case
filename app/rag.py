@@ -48,8 +48,8 @@ class MumsRAG:
         # Lower score = more similar in FAISS
         results = self.vectorstore.similarity_search_with_score(question, k=4)
 
-        # Filter out irrelevant results
-        threshold = 0.5
+        # Filter out irrelevant results (L2 distance: lower = more similar)
+        threshold = 1.5
         relevant = [doc for doc, score in results if score < threshold]
 
         return [doc.page_content for doc in relevant]
