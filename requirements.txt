@@ -1,0 +1,4 @@
+langchain_openai
+dotenv 
+langchain_community
+pytest
