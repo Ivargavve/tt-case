@@ -66,3 +66,18 @@ class TestSearchEngine(unittest.TestCase):
     self.assertGreater(len(results), 0)
     combined_results = " ".join(results).lower()
     self.assertIn("ceo", combined_results, "Results should contain the queried term")
+
+  def test_formulate_answer(self):
+    # Formulate answer should be a string and contain "Anna Svensson"
+    self.search_engine.add_document("mums_ab_organizational_structure.pdf")
+    self.search_engine.add_document("mums_ab_product_descriptions.pdf")
+    self.search_engine.add_document("mums_ab_annual_sales_report.pdf")
+
+    results = self.search_engine.rag.formulate_answer("Who is the CEO?")
+    results2 = self.search_engine.rag.formulate_answer("What is the total ammount of sales in January?")
+    self.assertIn("Anna Svensson", results)
+    self.assertIsInstance(results, str)
+    print(f"results: {results2}")
+
+
+  

@@ -53,7 +53,13 @@ class MumsRAG:
         relevant = [doc for doc, score in results if score < threshold]
 
         return [doc.page_content for doc in relevant]
-
+    
+    def formulate_answer(self, question: str) -> str:
+        chunks = self.query(question)
+        context = "\n".join(chunks)
+        if not context:
+            return "No relevant info found"
+        return self.llm.invoke(f"Given this context:\n{context}\n\nAnswer: {question}").content
 
 if __name__ == "__main__":
     rag = MumsRAG()
@@ -66,7 +72,10 @@ if __name__ == "__main__":
     print(f"Done. Loaded {len(rag.documents)} documents.")
 
     # Quick verification
-    results = rag.vectorstore.similarity_search("Who is the CEO?", k=2)
+    results = rag.vectorstore.similarity_search_with_score("Who is the CEO?", k=2)
+    answer = rag.formulate_answer("Who is the CEO?")
     print(f"\nTest query 'Who is the CEO?' returned {len(results)} chunks:")
-    for r in results:
-        print(f"  - {r.page_content[:100]}...")
+    for doc, score in results:
+        print(f"  [score: {score:.4f}] {doc.page_content[:100]}...")
+    print(f"formulated answer: {answer}")
+ 
